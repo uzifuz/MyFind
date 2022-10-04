@@ -20,10 +20,7 @@ void searchFile(path const &searchPath, string const &filename, bool insensitive
     // for (auto file : iter)
     directory_entry file;
     string out = "";
-    while (
-        recursive
-            ? ++r_iter != end(r_iter)
-            : ++iter != end(iter))
+    do
     {
         file = recursive ? *r_iter : *iter;
         string otherName = file.path().filename();
@@ -31,7 +28,11 @@ void searchFile(path const &searchPath, string const &filename, bool insensitive
         {
             out += to_string(getpid()) + ": " + filename + ": " + (string)absolute(file) + "\n";
         }
-    }
+    }while (
+        recursive
+            ? ++r_iter != end(r_iter)
+            : ++iter != end(iter));
+            
     auto writing = fdopen(*pipe, "w");
     fputs(&out[0], writing);
     fclose(writing);
