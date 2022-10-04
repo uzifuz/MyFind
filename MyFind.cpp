@@ -19,8 +19,6 @@ void searchFile(path const &searchPath, string const &filename, bool insensitive
     auto r_iter = recursive_directory_iterator{searchPath};
     // for (auto file : iter)
     directory_entry file;
-    /* counts how many files with the name have been found, lines 23, 35*/
-    int filecounter = 0;
     string out = "";
     while (
         recursive
@@ -31,31 +29,18 @@ void searchFile(path const &searchPath, string const &filename, bool insensitive
         string otherName = file.path().filename();
         if (filename.compare(otherName) == 0 || (insensitive && strcasecmp(&filename[0], &otherName[0]) == 0))
         {
-            /* adds each found file to the string to be written into the pipe, lines 36*/
-            filecounter++;
             out += to_string(getpid()) + ": " + filename + ": " + (string)absolute(file) + "\n";
         }
-    }
-    /* if no files have been found instead output an error message, lines 34-43*/
-    if(!filecounter){
-        out += to_string(getpid()) + ": " + filename + ": file not found at searchPath\n";
-        // std::cout << filename << ": file not found" << endl;
     }
     auto writing = fdopen(*pipe, "w");
     fputs(&out[0], writing);
     fclose(writing);
-}
-
-void inputErrorMessage() {
-    cerror << "Input invald, make sure the command follows the following structure:" << endl;
-    cerror << "myFind [i] [R] searchfile filename [filename]" << endl;
-    cerror << "where i and R are optional and multiple filenames can be searched for" << endl;
-    cerror << "Example: myFind i R testdirectory testfile1 testfile2 testfile3" << endl;
-    return;
+    // std::cout << filename << ": file not found" << endl;
 }
 
 int main(int argc, char *argv[])
 {
+
     bool recursive = 0;
     bool insensitive = 0;
     int opt;
@@ -71,10 +56,9 @@ int main(int argc, char *argv[])
             recursive = 1;
             break;
         case '?':
-            assert(1);
+            assert(1); /*invalid argument given*/
             break;
         default:
-            inputErrorMessage();
             assert(0);
             break;
         }
@@ -82,16 +66,14 @@ int main(int argc, char *argv[])
     int options = recursive + insensitive;
     if (options + 2 >= argc)
     {
-        inputErrorMessage();
+        std::cout << "too few arguments" << endl;
         return EXIT_FAILURE;
     }
     path searchpath = "";
     vector<string> filenames;
     for (int iter = options + 1; iter < argc; iter++)
     {
-        /* shortened the if statement */
-        (iter == options +1) ? searchpath = argv[iter] : filenames.push_back(argv[iter]);
-        /*if (iter == options + 1)
+        if (iter == options + 1)
         {
             searchpath = argv[iter];
             // cout << "searchpath: " << argv[iter] << endl;
@@ -100,7 +82,7 @@ int main(int argc, char *argv[])
         {
             filenames.push_back(argv[iter]);
             // cout << "filename: " << argv[iter] << endl;
-        }*/
+        }
     }
 
     int pid;
