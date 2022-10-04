@@ -51,9 +51,19 @@ int main(int argc, char *argv[])
         switch (opt)
         {
         case 'i':
+            if (insensitive)
+            {
+                cerr << "only one instance of a flag is allowed" << endl;
+                exit(EXIT_FAILURE);
+            }
             insensitive = 1;
             break;
         case 'R':
+            if (recursive)
+            {
+                cerr << "only one instance of a flag is allowed" << endl;
+                exit(EXIT_FAILURE);
+            }
             recursive = 1;
             break;
         case '?':
