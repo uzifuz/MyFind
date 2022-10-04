@@ -28,11 +28,11 @@ void searchFile(path const &searchPath, string const &filename, bool insensitive
         {
             out += to_string(getpid()) + ": " + filename + ": " + (string)absolute(file) + "\n";
         }
-    }while (
+    } while (
         recursive
             ? ++r_iter != end(r_iter)
             : ++iter != end(iter));
-            
+
     auto writing = fdopen(*pipe, "w");
     fputs(&out[0], writing);
     fclose(writing);
@@ -131,14 +131,18 @@ int main(int argc, char *argv[])
     reading = fdopen(fd[0], "r");
 
     // std::cout << getpid() << ") children: " << childPids.size() << endl;
-    while (wait(NULL) != -1)
-        ; // wait for children to terminate
 
     while (fgets(buffer, PIPE_BUF, reading) != NULL)
     {
         std::cout << buffer;
     }
     fclose(reading);
+
+    for (auto filename : filenames)
+    {
+        while (wait(NULL) != -1)
+            ; // wait for children to terminate
+    }
 
     return EXIT_SUCCESS;
 }
